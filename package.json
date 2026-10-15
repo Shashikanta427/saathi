@@ -1,0 +1,30 @@
+{
+  "name": "pahadi-swasthya-saathi",
+  "version": "1.0.0",
+  "description": "Pahadi Swasthya Saathi: Gen AI + Agentic AI health companion in JavaScript (Node.js)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node tests/test_flow.js",
+    "scheduler": "node scheduler.js"
+  },
+  "keywords": [
+    "health",
+    "genai",
+    "agentic-ai",
+    "gemini",
+    "watsonx",
+    "rag",
+    "uttarakhand"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^2.30.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "twilio": "^5.4.0"
+  }
+}

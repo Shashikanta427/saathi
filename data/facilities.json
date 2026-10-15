@@ -1,0 +1,15 @@
+{
+  "note": "DEMO DATA: only a few hospitals. In the real system, load the official NHM / health department facility directory.",
+  "facilities": [
+    {"name": "Doon Medical College Hospital, Dehradun", "district": "Dehradun", "type": "Government medical college hospital"},
+    {"name": "AIIMS Rishikesh", "district": "Dehradun", "type": "Super-speciality hospital (AIIMS)"},
+    {"name": "Base Hospital, Srinagar Garhwal", "district": "Pauri Garhwal", "type": "Base hospital"},
+    {"name": "Dr. Sushila Tiwari Government Hospital, Haldwani", "district": "Nainital", "type": "Government medical college hospital"}
+  ],
+  "helplines": [
+    {"number": "108", "use": "Ambulance / medical emergency"},
+    {"number": "112", "use": "National emergency number"},
+    {"number": "104", "use": "Health information helpline"},
+    {"number": "14416", "use": "Tele-MANAS mental health support"}
+  ]
+}

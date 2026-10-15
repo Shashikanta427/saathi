@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>पहाड़ी स्वास्थ्य साथी | Pahadi Swasthya Saathi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Emergency Alert Ribbon -->
+  <div class="emergency-ribbon" role="alert">
+    <div class="emergency-content">
+      <span class="pulse-icon">🚨</span>
+      <span class="emergency-text">
+        <strong>आपातकाल?</strong> अभी <strong>108</strong> पर कॉल करें | <strong>Emergency?</strong> Call <strong>108</strong> now
+      </span>
+      <a href="tel:108" class="emergency-btn">📞 Call 108</a>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <!-- Sidebar / Settings Drawer -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-mini">
+          <span class="brand-logo">🏔️</span>
+          <div>
+            <h3>स्वास्थ्य साथी</h3>
+            <p>Pahadi Health Companion</p>
+          </div>
+        </div>
+        <button id="close-sidebar-btn" class="icon-btn mobile-only" aria-label="Close sidebar">✕</button>
+      </div>
+
+      <div class="sidebar-section">
+        <label class="section-label">AI Model Status</label>
+        <div id="model-badge" class="status-badge mock">
+          <span class="status-dot"></span>
+          <span id="model-name">Loading model...</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <label class="section-label">Language / भाषा</label>
+        <div class="segmented-control" role="radiogroup">
+          <button class="seg-btn active" data-lang="auto">Auto</button>
+          <button class="seg-btn" data-lang="hi">हिंदी</button>
+          <button class="seg-btn" data-lang="en">English</button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <label class="section-label" for="phone-input">WhatsApp for Reminders (Optional)</label>
+        <div class="input-with-button">
+          <input type="tel" id="phone-input" placeholder="+91XXXXXXXXXX" autocomplete="tel">
+          <button id="save-phone-btn" class="small-btn">Save</button>
+        </div>
+        <p class="field-hint">Used for WhatsApp medicine alerts via Twilio.</p>
+      </div>
+
+      <div class="sidebar-section reminders-section">
+        <div class="section-header-row">
+          <label class="section-label">My Reminders / दवा याददाश्त</label>
+          <span class="reminder-count" id="reminder-count">0</span>
+        </div>
+        <div id="reminders-list" class="reminders-list">
+          <div class="empty-state">
+            No reminders yet.<br>Try saying: <em>"Remind me to take my BP tablet at 8 am and 8 pm"</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section helplines-section">
+        <label class="section-label">Uttarakhand Emergency Contacts</label>
+        <ul class="helpline-list">
+          <li><strong>108</strong> <span>Ambulance / आपातकालीन</span></li>
+          <li><strong>104</strong> <span>Health Advice / स्वास्थ्य परामर्श</span></li>
+          <li><strong>14416</strong> <span>Tele-MANAS Mental Health</span></li>
+          <li><strong>112</strong> <span>Police / All Emergency</span></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <p>ℹ️ Information only. Not a substitute for a doctor.</p>
+      </div>
+    </aside>
+
+    <!-- Main Chat Workspace -->
+    <main class="chat-workspace">
+      <!-- Top App Bar -->
+      <header class="app-header">
+        <button id="open-sidebar-btn" class="icon-btn mobile-only" aria-label="Open sidebar">☰</button>
+        <div class="app-title-group">
+          <h1>🏔️ पहाड़ी स्वास्थ्य साथी</h1>
+          <p class="subtitle">Gen AI + Agentic AI health companion for Uttarakhand villages</p>
+        </div>
+        <button id="clear-chat-btn" class="icon-btn secondary-btn" title="Clear Chat">🗑️ Clear</button>
+      </header>
+
+      <!-- Chat Container -->
+      <section class="messages-container" id="messages-container">
+        <!-- Welcome Hero Card -->
+        <div class="welcome-card" id="welcome-card">
+          <div class="welcome-icon">🏔️</div>
+          <h2>नमस्ते! मैं आपका स्वास्थ्य साथी हूँ।</h2>
+          <p>
+            You can ask about symptoms, blood test reports, hospital locations, or set medicine reminders.
+            हम आपके गाँव में, आपकी भाषा में मदद के लिए तैयार हैं।
+          </p>
+
+          <div class="examples-container">
+            <span class="examples-title">Try asking / पूछ कर देखें:</span>
+            <div class="example-chips">
+              <button class="chip" data-query="Mujhe 2 din se bukhar hai">🤒 Mujhe 2 din se bukhar hai</button>
+              <button class="chip" data-query="बच्चे को दस्त हो रहे हैं">👶 बच्चे को दस्त हो रहे हैं</button>
+              <button class="chip" data-query="My Hb is 9.2, sugar 128, BP 150/95">📋 My Hb is 9.2, sugar 128, BP 150/95</button>
+              <button class="chip" data-query="Mujhe roz subah 8 baje BP ki goli ka reminder lagao">💊 BP goli reminder roz subah 8 baje</button>
+              <button class="chip" data-query="Dehradun mein nazdeeki hospital kahan hai?">🏥 Dehradun mein hospital kahan hai?</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Input Area -->
+      <footer class="input-footer">
+        <form id="chat-form" class="chat-form">
+          <div class="input-wrapper">
+            <textarea
+              id="chat-input"
+              rows="1"
+              placeholder="अपनी तकलीफ़ लिखें / Type your health question here..."
+              required
+            ></textarea>
+            <button type="submit" id="send-btn" class="send-btn" aria-label="Send message">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </form>
+        <div class="input-disclaimer">
+          ⚠️ पहाड़ी स्वास्थ्य साथी शैक्षणिक प्रोटोटाइप है, डॉक्टर का विकल्प नहीं। आपातकाल में 108 डायल करें।
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
