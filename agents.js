@@ -140,8 +140,26 @@ export class Orchestrator {
   }
 
   async _plan(message) {
-    const raw = await this.llm.chat(ROUTER_SYSTEM, `USER_MESSAGE:\n${message}`, true);
-    const data = extractJson(raw) || {};
+    let data = {};
+    try {
+      const raw = await this.llm.chat(ROUTER_SYSTEM, `USER_MESSAGE:\n${message}`, true);
+      data = extractJson(raw) || {};
+    } catch (err) {
+      console.warn("Orchestrator plan LLM error, applying intelligent fallback:", err.message || err);
+      const lower = message.toLowerCase();
+      if (["remind", "yaad", "रिमाइंडर", "याद"].some(k => lower.includes(k))) {
+        data = { steps: [{ agent: "reminder", args: { medicine: "medicine", times: ["08:00"] } }] };
+      } else if (["hospital", "अस्पताल", "phc", "doctor kahan", "nearby"].some(k => lower.includes(k))) {
+        data = { steps: [{ agent: "nearby", args: { district: "Dehradun" } }] };
+      } else if (["hb", "hemoglobin", "sugar", "bp", "report"].some(k => lower.includes(k))) {
+        data = { steps: [{ agent: "report", args: {} }] };
+      } else if (["hi", "hello", "namaste", "नमस्ते", "hii", "hey"].some(k => lower.trim() === k || lower.startsWith(k + " "))) {
+        data = { steps: [{ agent: "chitchat", args: {} }] };
+      } else {
+        data = { steps: [{ agent: "health_qa", args: {} }] };
+      }
+    }
+
     const steps = [];
     if (Array.isArray(data.steps)) {
       for (const s of data.steps) {
@@ -249,8 +267,18 @@ export class Orchestrator {
     ].join("\n\n");
 
     const systemPrompt = COMPOSE_SYSTEM.replace("{lang_name}", langName);
-    const reply = await this.llm.chat(systemPrompt, userPrompt);
-    return (reply || "").trim();
+    try {
+      const reply = await this.llm.chat(systemPrompt, userPrompt);
+      return (reply || "").trim();
+    } catch (err) {
+      console.warn("Composer LLM error, providing fallback facts response:", err.message || err);
+      if (facts.length > 0) {
+        return facts.join("\n\n");
+      }
+      return lang === "hi"
+        ? "नमस्ते! मैं आपका पहाड़ी स्वास्थ्य साथी हूँ। मैं स्वास्थ्य समस्याओं, जांच रिपोर्ट, दवा रिमाइंडर और नज़दीकी अस्पतालों की जानकारी में आपकी मदद कर सकता हूँ। अपनी समस्या बताएं।"
+        : "Hello! I am your Pahadi Swasthya Saathi. I can help with health questions, test reports, medicine reminders, and nearest hospital info. How can I help you today?";
+    }
   }
 
   _guard(answer, lang, steps) {

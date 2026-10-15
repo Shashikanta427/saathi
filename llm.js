@@ -19,8 +19,15 @@ export class BaseLLM {
 export class GeminiLLM extends BaseLLM {
   constructor() {
     super();
-    this.apiKey = process.env.GEMINI_API_KEY;
-    this.modelId = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    this.apiKey = (process.env.GEMINI_API_KEY || "").trim();
+
+    // Normalize model ID: "gemini-2.5-flash" does not exist in Google API.
+    // Map to the active standard flash models: gemini-2.0-flash or gemini-1.5-flash
+    let model = (process.env.GEMINI_MODEL || "gemini-2.0-flash").trim();
+    if (model === "gemini-2.5-flash" || !model) {
+      model = "gemini-2.0-flash";
+    }
+    this.modelId = model;
     this.name = `Google Gemini (${this.modelId})`;
     this.client = null;
   }
@@ -43,23 +50,40 @@ export class GeminiLLM extends BaseLLM {
       config.responseMimeType = "application/json";
     }
 
-    const response = await ai.models.generateContent({
-      model: this.modelId,
-      contents: user,
-      config,
-    });
+    // Try primary model first, with automatic fallback models if an API error occurs
+    const candidateModels = [
+      this.modelId,
+      "gemini-2.0-flash",
+      "gemini-1.5-flash",
+      "gemini-flash-latest",
+    ].filter((m, idx, arr) => m && arr.indexOf(m) === idx);
 
-    return response.text || "";
+    let lastError = null;
+    for (const m of candidateModels) {
+      try {
+        const response = await ai.models.generateContent({
+          model: m,
+          contents: user,
+          config,
+        });
+        return response.text || "";
+      } catch (err) {
+        lastError = err;
+        console.warn(`Gemini generation on model '${m}' failed:`, err.message || err);
+      }
+    }
+
+    throw lastError;
   }
 }
 
 export class WatsonxLLM extends BaseLLM {
   constructor() {
     super();
-    this.apiKey = process.env.WATSONX_APIKEY;
-    this.projectId = process.env.WATSONX_PROJECT_ID;
+    this.apiKey = (process.env.WATSONX_APIKEY || "").trim();
+    this.projectId = (process.env.WATSONX_PROJECT_ID || "").trim();
     this.baseUrl = (process.env.WATSONX_URL || "https://us-south.ml.cloud.ibm.com").replace(/\/$/, "");
-    this.modelId = process.env.WATSONX_MODEL_ID || "ibm/granite-3-3-8b-instruct";
+    this.modelId = (process.env.WATSONX_MODEL_ID || "ibm/granite-3-3-8b-instruct").trim();
     this.name = `IBM watsonx.ai (${this.modelId})`;
     this.token = null;
     this.tokenExpiry = 0;
