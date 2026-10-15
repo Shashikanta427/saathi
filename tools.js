@@ -9,11 +9,17 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const defaultReminderPath = path.join(__dirname, "data", "reminders.json");
+function resolveDataPath(rel) {
+  const cwdPath = path.join(process.cwd(), "data", rel);
+  if (fs.existsSync(cwdPath)) return cwdPath;
+  return path.join(__dirname, "data", rel);
+}
+
+const defaultReminderPath = resolveDataPath("reminders.json");
 export let REMINDER_FILE = process.env.VERCEL
   ? path.join("/tmp", "reminders.json")
   : defaultReminderPath;
-export let FACILITY_FILE = path.join(__dirname, "data", "facilities.json");
+export let FACILITY_FILE = resolveDataPath("facilities.json");
 
 if (process.env.VERCEL && !fs.existsSync(REMINDER_FILE) && fs.existsSync(defaultReminderPath)) {
   try {

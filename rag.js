@@ -24,21 +24,32 @@ function extractCharWbNgrams(text, minN = 3, maxN = 5) {
   return ngrams;
 }
 
+function resolveKnowledgeFolder(folder) {
+  if (folder && fs.existsSync(folder)) return folder;
+  const cwdFolder = path.join(process.cwd(), "knowledge");
+  if (fs.existsSync(cwdFolder)) return cwdFolder;
+  const dirFolder = path.join(__dirname, "knowledge");
+  if (fs.existsSync(dirFolder)) return dirFolder;
+  return folder || dirFolder;
+}
+
 export class Retriever {
-  constructor(folder = path.join(__dirname, "knowledge")) {
+  constructor(folder = null) {
+    const targetFolder = resolveKnowledgeFolder(folder);
     this.chunks = []; // { source, title, text }
     this.vocab = new Map(); // ngram -> index
     this.idf = [];
     this.docVectors = [];
 
-    if (!fs.existsSync(folder)) {
+    if (!fs.existsSync(targetFolder)) {
+      console.warn("Knowledge folder not found:", targetFolder);
       return;
     }
 
-    const files = fs.readdirSync(folder).filter(f => f.endsWith(".md") || f.endsWith(".txt")).sort();
+    const files = fs.readdirSync(targetFolder).filter(f => f.endsWith(".md") || f.endsWith(".txt")).sort();
 
     for (const file of files) {
-      const fullPath = path.join(folder, file);
+      const fullPath = path.join(targetFolder, file);
       const raw = fs.readFileSync(fullPath, "utf-8");
       // Split on "\n## " or beginning of file with "## "
       const parts = raw.split(/\n(?=## )/);

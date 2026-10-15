@@ -80,21 +80,25 @@ app.delete("/api/reminders/:id", (req, res) => {
   res.json({ success: true, reminders: tools.listReminders("demo-user") });
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`\n🏔️ Pahadi Swasthya Saathi running at: http://localhost:${PORT}`);
-  console.log(`🧠 AI Provider: ${llm.name}`);
-  if (llm.isMock) {
-    console.log("ℹ️ Running in MOCK mode (no API key configured). Set GEMINI_API_KEY or WATSONX_APIKEY in .env for real AI.");
-  }
-});
+export default app;
 
-server.on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(`\n❌ Port ${PORT} is already in use by another process.`);
-    console.error(`💡 Tip: Run with another port, for example: PORT=8502 npm start`);
-    console.error(`   Or find and stop the process using port ${PORT}: npx kill-port ${PORT}\n`);
-  } else {
-    console.error("Server error:", err);
-  }
-  process.exit(1);
-});
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, () => {
+    console.log(`\n🏔️ Pahadi Swasthya Saathi running at: http://localhost:${PORT}`);
+    console.log(`🧠 AI Provider: ${llm.name}`);
+    if (llm.isMock) {
+      console.log("ℹ️ Running in MOCK mode (no API key configured). Set GEMINI_API_KEY or WATSONX_APIKEY in .env for real AI.");
+    }
+  });
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`\n❌ Port ${PORT} is already in use by another process.`);
+      console.error(`💡 Tip: Run with another port, for example: PORT=8502 npm start`);
+      console.error(`   Or find and stop the process using port ${PORT}: npx kill-port ${PORT}\n`);
+    } else {
+      console.error("Server error:", err);
+    }
+    process.exit(1);
+  });
+}
