@@ -21,11 +21,15 @@ export class GeminiLLM extends BaseLLM {
     super();
     this.apiKey = (process.env.GEMINI_API_KEY || "").trim();
 
-    // Normalize model ID: "gemini-2.5-flash" does not exist in Google API.
-    // Map to the active standard flash models: gemini-2.0-flash or gemini-1.5-flash
-    let model = (process.env.GEMINI_MODEL || "gemini-2.0-flash").trim();
-    if (model === "gemini-2.5-flash" || !model) {
-      model = "gemini-2.0-flash";
+    // Default to the active, high-availability model
+    let model = (process.env.GEMINI_MODEL || "gemini-flash-lite-latest").trim();
+    if (
+      model === "gemini-2.5-flash" ||
+      model === "gemini-2.0-flash" ||
+      model === "gemini-1.5-flash" ||
+      !model
+    ) {
+      model = "gemini-flash-lite-latest";
     }
     this.modelId = model;
     this.name = `Google Gemini (${this.modelId})`;
@@ -50,11 +54,12 @@ export class GeminiLLM extends BaseLLM {
       config.responseMimeType = "application/json";
     }
 
-    // Try primary model first, with automatic fallback models if an API error occurs
+    // Try primary working models in order of stability and quota availability
     const candidateModels = [
       this.modelId,
-      "gemini-2.0-flash",
-      "gemini-1.5-flash",
+      "gemini-flash-lite-latest",
+      "gemini-3.1-flash-lite",
+      "gemini-3-flash-preview",
       "gemini-flash-latest",
     ].filter((m, idx, arr) => m && arr.indexOf(m) === idx);
 
